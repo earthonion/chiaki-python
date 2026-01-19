@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsetsu.a CMakeFiles/setsu.dir/src/setsu.c.o
+/usr/bin/ranlib libsetsu.a

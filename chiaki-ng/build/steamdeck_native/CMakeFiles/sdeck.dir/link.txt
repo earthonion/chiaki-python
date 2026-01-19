@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsdeck.a CMakeFiles/sdeck.dir/src/sdeck.c.o
+/usr/bin/ranlib libsdeck.a

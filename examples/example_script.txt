@@ -1,0 +1,25 @@
+# Example PS4 Controller Script
+# Format: BUTTON [duration] or DELAY seconds
+
+# Hold PS button for 2 seconds to open menu
+PS 2.0
+
+# Navigate up 5 times
+UP
+UP
+UP
+UP
+UP
+
+# Wait a moment
+DELAY 0.3
+
+# Navigate: down, down, right, down, down
+DOWN
+DOWN
+RIGHT
+DOWN
+DOWN
+
+# Press X to select
+X
