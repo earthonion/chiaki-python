@@ -45,7 +45,7 @@ python3 examples/controller_script.py examples/example_script.txt PS4-910
 
 ```bash
 # Clone the repository with submodules
-git clone --recursive https://github.com/YOUR_USERNAME/chiaki-python.git
+git clone --recursive https://github.com/earthonion/chiaki-python.git
 cd chiaki-python
 
 # Or if already cloned, initialize submodules
@@ -255,3 +255,4 @@ This project is based on and includes code from:
 This project adds a Python wrapper (`src/python_wrapper.c`) that links with the chiaki-ng library, exposing a simplified C API for Python bindings via ctypes. The wrapper is kept separate from upstream chiaki-ng to allow easy updates.
 
 See the [LICENSE](LICENSE) file for the full license text.
+
