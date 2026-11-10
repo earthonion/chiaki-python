@@ -27,6 +27,10 @@ python3 examples/controller.py PS4-910
 python3 examples/controller_script.py examples/example_script.txt PS4-910
 ```
 
+## For agents
+
+See [AGENTS.md](AGENTS.md) for screenshot-first controller workflows, headless operation, registration, credential handling, and reboot/jailbreak recovery. Examples accept either a Chiaki profile nickname or a registration JSON path. Use `CHIAKI_HOST` to override a stale saved console address without modifying credentials.
+
 ## Features
 
 - Connect to PS4/PS5 consoles via Remote Play

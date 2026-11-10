@@ -157,11 +157,10 @@ def demo_controller(console_name: str = "PS4-910"):
         print(f"Error loading config: {e}")
         return False
 
-    HOST = host_config['host']
+    HOST = os.environ.get('CHIAKI_HOST', host_config['host'])
     REGIST_KEY = host_config['regist_key']
     RP_KEY = host_config['rp_key']
-    # PSN Account ID (base64 encoded, 8 bytes)
-    PSN_ID = host_config.get('psn_account_id', "U3hhcG9sbG8=")  # Default: "Shxpollo"
+    PSN_ID = os.environ.get('CHIAKI_PSN_ID', host_config.get('psn_account_id', "U3hhcG9sbG8="))
     psn_bytes = base64.b64decode(PSN_ID)
     psn_array = (ctypes.c_uint8 * 8)(*psn_bytes[:8])
 
@@ -171,7 +170,7 @@ def demo_controller(console_name: str = "PS4-910"):
         REGIST_KEY.encode('utf-8'),
         RP_KEY.encode('utf-8'),
         psn_array,
-        False, 3, 60
+        host_config.get('is_ps5', False), 3, 60
     )
 
     if not session:

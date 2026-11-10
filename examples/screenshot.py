@@ -55,13 +55,13 @@ def take_screenshot(console_name: str = "PS4-910", output_path: str = "screensho
         print("Make sure Chiaki is configured with your PS4 credentials")
         return False
 
-    HOST = host_config['host']
+    HOST = os.environ.get('CHIAKI_HOST', host_config['host'])
     REGIST_KEY = host_config['regist_key']
     RP_KEY = host_config['rp_key']
 
     # PSN Account ID (base64 encoded, 8 bytes)
     # Get from config or use default (this is the account ID linked to your PS4)
-    PSN_ID = host_config.get('psn_account_id', "U3hhcG9sbG8=")  # Default: "Shxpollo"
+    PSN_ID = os.environ.get('CHIAKI_PSN_ID', host_config.get('psn_account_id', "U3hhcG9sbG8="))
     psn_bytes = base64.b64decode(PSN_ID)
     psn_array = (ctypes.c_uint8 * 8)(*psn_bytes[:8])
 
@@ -73,7 +73,7 @@ def take_screenshot(console_name: str = "PS4-910", output_path: str = "screensho
         REGIST_KEY.encode('utf-8'),
         RP_KEY.encode('utf-8'),
         psn_array,
-        False,  # is_ps5
+        host_config.get('is_ps5', False),
         3,      # resolution: 1=360p, 2=540p, 3=720p, 4=1080p
         60      # fps: 30 or 60
     )

@@ -36,10 +36,10 @@ def stream_video(console_name: str = "PS4-910"):
         print(f"Error loading config: {e}")
         return False
 
-    HOST = host_config['host']
+    HOST = os.environ.get('CHIAKI_HOST', host_config['host'])
     REGIST_KEY = host_config['regist_key']
     RP_KEY = host_config['rp_key']
-    PSN_ID = host_config.get('psn_account_id', "U3hhcG9sbG8=")
+    PSN_ID = os.environ.get('CHIAKI_PSN_ID', host_config.get('psn_account_id', "U3hhcG9sbG8="))
     psn_bytes = base64.b64decode(PSN_ID)
     psn_array = (ctypes.c_uint8 * 8)(*psn_bytes[:8])
 
@@ -49,7 +49,7 @@ def stream_video(console_name: str = "PS4-910"):
         REGIST_KEY.encode('utf-8'),
         RP_KEY.encode('utf-8'),
         psn_array,
-        False,  # is_ps5
+        host_config.get('is_ps5', False),
         3,      # 720p
         60      # 60fps
     )

@@ -3,6 +3,7 @@ Parser for Chiaki configuration files.
 """
 
 import configparser
+import json
 from typing import Dict, List, Optional, Any
 
 
@@ -99,7 +100,7 @@ def parse_chiaki_config(config_path: str = "~/.config/Chiaki/Chiaki.conf") -> Li
     import os
     config_path = os.path.expanduser(config_path)
 
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(interpolation=None)
     config.read(config_path)
 
     hosts = []
@@ -172,12 +173,15 @@ def get_host_by_name(name: str, config_path: str = "~/.config/Chiaki/Chiaki.conf
     Get a specific host configuration by name.
 
     Args:
-        name: Server nickname (e.g., "PS4-910")
+        name: Server nickname or a JSON profile written by examples/register.py
         config_path: Path to Chiaki.conf
 
     Returns:
         Host configuration dict or None
     """
+    if name.lower().endswith('.json'):
+        with open(name, 'r', encoding='utf-8') as stream:
+            return json.load(stream)
     hosts = parse_chiaki_config(config_path)
     for host in hosts:
         if host.get('name') == name:

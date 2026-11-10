@@ -2,7 +2,7 @@
 # Build script for chiaki-python
 # Creates libchiaki.so with the Python wrapper
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHIAKI_DIR="$SCRIPT_DIR/chiaki-ng"
@@ -26,9 +26,30 @@ if [ ! -f "$CHIAKI_DIR/CMakeLists.txt" ]; then
     git submodule update --init --recursive
 fi
 
+DEPS_DIR="$SCRIPT_DIR/.deps/root"
+if [ ! -f "$DEPS_DIR/usr/lib/x86_64-linux-gnu/libjson-c.a" ] || \
+   [ ! -f "$DEPS_DIR/usr/lib/x86_64-linux-gnu/libminiupnpc.a" ]; then
+    for cmd in apt-get dpkg-deb; do
+        if ! command -v "$cmd" &> /dev/null; then
+            echo "Error: $cmd is required to fetch local json-c/miniupnpc development files" >&2
+            exit 1
+        fi
+    done
+    mkdir -p "$SCRIPT_DIR/.deps/packages" "$DEPS_DIR"
+    (
+        cd "$SCRIPT_DIR/.deps/packages"
+        apt-get download libjson-c-dev libminiupnpc-dev
+        for package in ./*.deb; do
+            dpkg-deb -x "$package" "$DEPS_DIR"
+        done
+    )
+fi
+
 # Create build directory
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
+export PKG_CONFIG_PATH="$DEPS_DIR/usr/lib/x86_64-linux-gnu/pkgconfig"
+export PKG_CONFIG_SYSROOT_DIR="$DEPS_DIR"
 
 # Configure with CMake
 echo "Configuring chiaki-ng..."
@@ -38,7 +59,11 @@ cmake .. \
     -DCHIAKI_ENABLE_GUI=OFF \
     -DCHIAKI_ENABLE_CLI=OFF \
     -DCHIAKI_ENABLE_ANDROID=OFF \
-    -DCHIAKI_ENABLE_TESTS=OFF
+    -DCHIAKI_ENABLE_TESTS=OFF \
+    -DCHIAKI_ENABLE_STEAM_SHORTCUT=OFF \
+    -DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF \
+    -DCHIAKI_LIB_ENABLE_OPUS=OFF \
+    -DCHIAKI_ENABLE_RUDP=OFF
 
 # Build the library
 echo "Building chiaki-lib..."
@@ -58,8 +83,10 @@ gcc -shared -fPIC -o "$SCRIPT_DIR/libchiaki.so" \
     -Wl,--whole-archive lib/libchiaki.a -Wl,--no-whole-archive \
     third-party/nanopb/libprotobuf-nanopb.a \
     third-party/curl/lib/libcurl.a \
-    -lssl -lcrypto -lopus -lspeexdsp -ljson-c -lminiupnpc \
-    -lm -lpthread -lz -lJerasure -lavcodec -lavutil
+    third-party/libjerasure.a third-party/libgf_complete.a \
+    "$DEPS_DIR/usr/lib/x86_64-linux-gnu/libjson-c.a" \
+    "$DEPS_DIR/usr/lib/x86_64-linux-gnu/libminiupnpc.a" \
+    -lssl -lcrypto -lm -lpthread -lz
 
 echo "=== Build complete ==="
 echo "Library: $SCRIPT_DIR/libchiaki.so"
